@@ -10,6 +10,7 @@ namespace PureOtpTest
         static void Main(string[] args)
         {
 	        const string secret = "MyTestSecret";
+            var totp1 = KeyUrl.FromUrl("otpauth://totp/Dropbox:passxyz@foxmail.com?secret=3RR7SHUBHC5IU3Q575WS4INHUM&issuer=Dropbox");
 	        var totp = new PureOtp.Totp(Encoding.UTF8.GetBytes(secret));
 			RETRY:
 	        var otpCode = totp.ComputeTotp();

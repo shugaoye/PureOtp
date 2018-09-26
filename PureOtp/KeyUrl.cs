@@ -141,7 +141,7 @@ namespace PureOtp
 		{
 			var collection = ParseAndValidateQueryString(url, out var digits);
 
-			if (!ValidateQueryStringFields(collection, UrlConstants.AlgorithmParameter, UrlConstants.DigitsParameter, UrlConstants.PeriodParameter, UrlConstants.SecretParameter))
+			if (!ValidateQueryStringFields(collection, UrlConstants.AlgorithmParameter, UrlConstants.DigitsParameter, UrlConstants.PeriodParameter, UrlConstants.SecretParameter, UrlConstants.IssuerParameter))
 				throw new ArgumentException("Invalid parameter in query string");
 
 			var algorithm = OtpHashMode.Sha1;
@@ -164,11 +164,13 @@ namespace PureOtp
 					throw new ArgumentException($"Invalid digits {collection[UrlConstants.DigitsParameter]}, must be a number");
 			}
 
-			var key = Base32Encoding.Standard.ToBytes(collection[UrlConstants.SecretParameter]);
-			return new Totp(key, period, algorithm, digits);
+            // Wiry.Base32 cannot work with Dropbox, changed to Devin Martin's version
+            //var key = Base32Encoding.Standard.ToBytes(collection[UrlConstants.SecretParameter]);
+            var key = Base32.Decode(collection[UrlConstants.SecretParameter]);
+            return new Totp(key, period, algorithm, digits);
 		}
 
-		private static NameValueCollection ParseAndValidateQueryString(Uri uri, out int digits)
+        private static NameValueCollection ParseAndValidateQueryString(Uri uri, out int digits)
 		{
 			if (string.IsNullOrEmpty(uri.Query))
 				throw new ArgumentException("Must have a query string");
